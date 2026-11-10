@@ -1,452 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <!-- Essential for iOS PWA: viewport-fit=cover handles the notch/safe areas -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <!-- PWA / iOS Meta Tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0B1120">
-    <title>Nexus Flight Log</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* iOS specifics and smooth transitions */
-        :root {
-            --safe-top: env(safe-area-inset-top, 0px);
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
-        }
-        body {
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            background-color: #0B1120;
-        }
-        /* Prevent iOS input zoom by forcing 16px */
-        input[type="text"], input[type="date"], input[type="number"] {
-            font-size: 16px !important;
-        }
-        .modal-enter {
-            transform: translateY(0%);
-        }
-        .modal-leave {
-            transform: translateY(100%);
-        }
-        /* Hide scrollbar for cleaner mobile look */
-        ::-webkit-scrollbar {
-            display: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101b2b">
+<title>AEROLYT — Flight Intelligence</title>
+<style>
+:root{--navy:#101b2b;--navy2:#17263a;--ink:#182638;--muted:#718096;--line:#e5ebf1;--bg:#f4f7fa;--white:#fff;--teal:#20b6a6;--teal2:#0d9488;--blue:#3b82f6;--red:#d65b68;--shadow:0 12px 35px rgba(20,38,58,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}.shell{min-height:100vh;display:grid;grid-template-columns:248px 1fr}
+.sidebar{background:var(--navy);color:#d8e1ec;padding:26px 17px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:12px;padding:0 10px 34px}.brandmark{width:38px;height:38px;border-radius:12px;background:linear-gradient(145deg,#27c5b3,#168b91);display:grid;place-items:center;color:white;font-size:20px;font-weight:800;box-shadow:0 7px 18px #0e8f8a55}.brandname{font-size:17px;font-weight:800;letter-spacing:1.5px;color:white}.brandname small{display:block;font-size:9px;letter-spacing:2.4px;color:#8da2b9;font-weight:600;margin-top:3px}
+.navlabel{font-size:10px;letter-spacing:1.7px;color:#71859c;font-weight:800;padding:0 12px;margin:9px 0 12px}.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;color:#9fb0c4;text-align:left;padding:12px 13px;border-radius:10px;display:flex;align-items:center;gap:12px;font-size:13px;font-weight:600}.nav button.active,.nav button:hover{background:#20354c;color:#fff}.nav .ico{width:18px;text-align:center;font-size:16px}.sidebottom{margin-top:auto;border-top:1px solid #26384d;padding:18px 10px 0;color:#7f93a9;font-size:11px;line-height:1.6}.status{display:flex;align-items:center;gap:8px;color:#a9bdcf;margin-bottom:8px}.dot{width:7px;height:7px;background:#28c6a9;border-radius:50%;box-shadow:0 0 0 4px #28c6a91b}
+.main{min-width:0}.topbar{height:76px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 38px;position:sticky;top:0;z-index:5}.crumb{font-size:12px;color:#91a0b1}.crumb strong{color:#34465b;font-weight:700}.topright{display:flex;align-items:center;gap:18px}.today{font-size:12px;color:#748398}.avatar{width:34px;height:34px;border-radius:50%;background:#e1f4f1;color:#137e78;display:grid;place-items:center;font-weight:800;font-size:12px}
+.content{max-width:1500px;margin:auto;padding:34px 38px 55px}.pagehead{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:27px}.eyebrow{font-size:10px;font-weight:800;letter-spacing:2px;color:var(--teal2);margin-bottom:9px}.pagehead h1{margin:0;color:#17283c;font-size:29px;letter-spacing:-.8px}.pagehead p{margin:8px 0 0;color:#8190a1;font-size:13px}.actions{display:flex;gap:9px;flex-wrap:wrap}.btn{border:1px solid #dce4eb;background:white;color:#43546a;border-radius:9px;padding:10px 14px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:8px;transition:.2s}.btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px #1d344b12}.btn.primary{background:var(--navy2);border-color:var(--navy2);color:white}.btn.teal{background:var(--teal2);border-color:var(--teal2);color:white}.btn.danger{color:var(--red)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:23px}.stat{background:white;border:1px solid var(--line);border-radius:13px;padding:19px 20px;box-shadow:0 3px 10px #182b3e04;position:relative;overflow:hidden}.stat:after{content:"";position:absolute;right:-18px;top:-25px;width:85px;height:85px;border-radius:50%;background:#eaf8f6}.stat:nth-child(2):after{background:#edf3ff}.stat:nth-child(3):after{background:#f2efff}.stat:nth-child(4):after{background:#fff4e9}.statlabel{font-size:10px;letter-spacing:1.2px;font-weight:800;color:#8a98a8;text-transform:uppercase;position:relative;z-index:1}.statvalue{font-size:29px;font-weight:800;letter-spacing:-1px;color:#1c2d41;margin-top:11px;position:relative;z-index:1}.statfoot{font-size:11px;color:#9aa6b3;margin-top:4px;position:relative;z-index:1}
+.panel{background:white;border:1px solid var(--line);border-radius:14px;box-shadow:0 3px 10px #182b3e04}.panelhead{padding:19px 21px;border-bottom:1px solid #edf1f5;display:flex;justify-content:space-between;align-items:center;gap:15px}.paneltitle{font-size:14px;font-weight:800;color:#26384d}.panelsub{font-size:11px;color:#95a1ae;margin-top:4px}.toolbar{padding:15px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #edf1f5}.search{position:relative;flex:1;max-width:360px}.search span{position:absolute;left:12px;top:9px;color:#93a0ae}.search input{width:100%;padding:10px 12px 10px 34px;border:1px solid #e0e7ee;border-radius:8px;font-size:12px;outline:none;background:#fbfcfd}.search input:focus,.field input:focus{border-color:#63c9bd;box-shadow:0 0 0 3px #20b6a61a}.toolbar select{padding:10px 12px;border:1px solid #e0e7ee;border-radius:8px;color:#65758a;background:#fff;font-size:12px;outline:none}
+.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:700px}th{text-align:left;padding:13px 20px;background:#fbfcfd;color:#94a0ad;font-size:9px;letter-spacing:1.2px;text-transform:uppercase;font-weight:800}td{padding:15px 20px;border-top:1px solid #f0f3f6;font-size:12px;color:#536479}tbody tr:hover{background:#fbfdfd}.flightno{font-weight:800;color:#22364b;font-size:13px}.datecell{color:#8290a0}.tag{display:inline-flex;align-items:center;padding:5px 8px;background:#f0f6f8;color:#536b7c;border-radius:6px;font-size:10px;font-weight:700}.seat{background:#eaf7f5;color:#12877d}.rowactions{display:flex;gap:5px}.iconbtn{border:0;background:transparent;color:#8796a6;padding:6px;border-radius:6px}.iconbtn:hover{background:#eef6f5;color:#148c82}.iconbtn.del:hover{background:#fff0f1;color:var(--red)}.empty{padding:55px 20px;text-align:center;color:#9aa7b5}.empty .plane{font-size:34px;margin-bottom:10px}.empty strong{display:block;color:#506176;font-size:14px;margin-bottom:6px}.empty span{font-size:12px}.footnote{padding:14px 20px;border-top:1px solid #edf1f5;color:#9aa6b3;font-size:10px;display:flex;justify-content:space-between}
+.overlay{position:fixed;inset:0;background:#0d1929a6;z-index:20;display:none;align-items:center;justify-content:center;padding:20px}.overlay.show{display:flex}.modal{width:min(560px,100%);background:white;border-radius:16px;box-shadow:0 25px 80px #06101f55;overflow:hidden;animation:rise .2s ease}@keyframes rise{from{transform:translateY(10px);opacity:.6}to{transform:none;opacity:1}}.modalhead{padding:21px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modalhead h2{margin:0;font-size:17px;color:#203248}.modalhead p{margin:5px 0 0;font-size:11px;color:#8b99a8}.close{border:0;background:#f1f4f7;border-radius:8px;width:31px;height:31px;color:#607185;font-size:18px}.formbody{padding:22px 24px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field.full{grid-column:1/-1}.field label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:800;color:#7d8b9a;margin:0 0 7px}.field input{width:100%;border:1px solid #dfe6ed;border-radius:8px;padding:11px 12px;font-size:13px;color:#304258;outline:none;background:#fcfdfe}.modalfoot{padding:16px 24px;background:#fafbfd;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:9px}.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#17283b;color:#fff;border-radius:9px;padding:12px 18px;font-size:12px;box-shadow:var(--shadow);transition:.25s;z-index:40}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:1000px){.shell{grid-template-columns:76px 1fr}.sidebar{padding:22px 10px}.brand{padding:0 9px 32px}.brandname,.navlabel,.nav button span:not(.ico),.sidebottom{display:none}.nav button{justify-content:center;padding:13px 8px}.nav .ico{font-size:18px}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.shell{display:block}.sidebar{height:auto;position:sticky;top:0;z-index:10;padding:10px 14px;display:flex;flex-direction:row;align-items:center;justify-content:space-between}.brand{padding:0}.brandname{display:block}.brandmark{width:34px;height:34px}.navlabel,.sidebottom{display:none}.nav{display:flex;gap:3px}.nav button{padding:9px}.nav button span:not(.ico){display:none}.topbar{height:54px;padding:0 17px}.content{padding:24px 15px 40px}.pagehead{display:block}.pagehead h1{font-size:25px}.actions{margin-top:17px}.stats{gap:9px}.stat{padding:14px}.statvalue{font-size:24px}.statlabel{font-size:9px}.toolbar{flex-wrap:wrap;padding:12px}.search{max-width:none;flex-basis:100%}.toolbar select{flex:1}.panelhead{padding:16px}.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.today{display:none}}
+</style>
 </head>
-<body class="text-slate-300 font-sans min-h-screen selection:bg-indigo-500/30 overflow-x-hidden pt-[var(--safe-top)] pb-[var(--safe-bottom)]">
-
-    <!-- Top Navigation Bar -->
-    <nav class="sticky top-[var(--safe-top)] left-0 right-0 z-30 bg-[#0B1120]/80 backdrop-blur-xl border-b border-slate-800/80 px-4 py-3 flex justify-between items-center">
-        <h1 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-teal-400">Nexus Log</h1>
-        
-        <div class="flex items-center gap-3">
-            <button onclick="exportCSV()" class="p-2 text-teal-400 active:scale-95 transition-transform" aria-label="Export CSV">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-            </button>
-            <label for="csvFileInput" class="p-2 text-indigo-400 active:scale-95 transition-transform cursor-pointer" aria-label="Import CSV">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-            </label>
-            <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="importCSV(event)">
-        </div>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <div class="brand"><div class="brandmark">✈</div><div class="brandname">AEROLYT<small>FLIGHT INTELLIGENCE</small></div></div>
+  <div>
+    <div class="navlabel">WORKSPACE</div>
+    <nav class="nav">
+      <button class="active" data-view="overview"><span class="ico">▦</span><span>Overview</span></button>
+      <button data-view="flights"><span class="ico">✈</span><span>Flight records</span></button>
+      <button data-view="insights"><span class="ico">◷</span><span>Flight insights</span></button>
     </nav>
-
-    <!-- Main Content: Flight List -->
-    <main class="px-4 py-6 mb-24" id="mainContent">
-        <!-- Empty State -->
-        <div id="emptyState" class="hidden flex flex-col items-center justify-center p-8 mt-12 text-slate-500">
-            <div class="w-20 h-20 mb-4 rounded-3xl bg-[#111827] flex items-center justify-center border border-slate-700/50 shadow-inner">
-                <svg class="w-10 h-10 text-indigo-400/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            </div>
-            <p class="text-base font-semibold text-slate-300">No telemetry data</p>
-            <p class="text-sm mt-1 text-slate-500 text-center">Tap the + button to log a flight or import a dataset.</p>
-        </div>
-
-        <div id="flightList" class="space-y-4">
-            <!-- Cards generated by JS -->
-        </div>
-    </main>
-
-    <!-- Floating Action Button (FAB) -->
-    <button onclick="openForm()" class="fixed bottom-8 right-4 z-20 w-14 h-14 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full shadow-lg shadow-indigo-500/30 flex items-center justify-center text-white active:scale-90 transition-all">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-    </button>
-
-    <!-- Slide-up Modal Form (iOS Style) -->
-    <div id="formModalOverlay" class="fixed inset-0 bg-black/60 z-40 hidden opacity-0 transition-opacity duration-300" onclick="closeForm()"></div>
-    
-    <div id="formModal" class="fixed inset-x-0 bottom-0 z-50 bg-[#111827] rounded-t-3xl border-t border-slate-700/50 modal-leave transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] pt-2 pb-[var(--safe-bottom)] flex flex-col max-h-[90vh]">
-        <!-- Grabber handle -->
-        <div class="w-12 h-1.5 bg-slate-600 rounded-full mx-auto mb-4 mt-2"></div>
-        
-        <div class="px-6 pb-4 flex justify-between items-center border-b border-slate-800/80 shrink-0">
-            <h2 id="formTitle" class="text-lg font-bold text-white">Log Flight</h2>
-            <button type="button" onclick="closeForm()" class="text-slate-400 font-medium text-sm px-2 py-1 active:text-white">Cancel</button>
-        </div>
-
-        <div class="overflow-y-auto px-6 py-5 space-y-5">
-            <form id="flightForm" onsubmit="handleFormSubmit(event)">
-                <input type="hidden" id="flightId">
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-[11px] font-semibold text-slate-400 mb-1.5 uppercase tracking-wider ml-1">Flight Number</label>
-                        <input type="text" id="flightNumber" required placeholder="e.g., QF1" 
-                            class="w-full bg-[#0B1120] rounded-xl border border-slate-700/50 px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all placeholder-slate-600">
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-400 mb-1.5 uppercase tracking-wider ml-1">Date</label>
-                            <input type="date" id="flightDate" required onchange="document.getElementById('flightYear').value = this.value.split('-')[0]"
-                                class="w-full bg-[#0B1120] rounded-xl border border-slate-700/50 px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all [color-scheme:dark]">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-400 mb-1.5 uppercase tracking-wider ml-1">Year</label>
-                            <input type="number" id="flightYear" required placeholder="YYYY" 
-                                class="w-full bg-[#0B1120] rounded-xl border border-slate-700/50 px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all placeholder-slate-600">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-[11px] font-semibold text-slate-400 mb-1.5 uppercase tracking-wider ml-1">Aircraft Reg</label>
-                        <input type="text" id="aircraftReg" required placeholder="e.g., VH-OQA" 
-                            class="w-full bg-[#0B1120] rounded-xl border border-slate-700/50 px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all placeholder-slate-600">
-                    </div>
-
-                    <div>
-                        <label class="block text-[11px] font-semibold text-slate-400 mb-1.5 uppercase tracking-wider ml-1">Seat</label>
-                        <input type="text" id="seat" required placeholder="e.g., 3A" 
-                            class="w-full bg-[#0B1120] rounded-xl border border-slate-700/50 px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all placeholder-slate-600">
-                    </div>
-                </div>
-
-                <div class="mt-8 pb-4">
-                    <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-3.5 px-4 rounded-xl shadow-lg shadow-indigo-500/25 active:scale-[0.98] transition-all">
-                        Save Flight
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Notification Toast (iOS Pill style) -->
-    <div id="toast" class="fixed top-[max(1rem,var(--safe-top))] left-1/2 -translate-x-1/2 transform transition-all duration-300 -translate-y-20 opacity-0 bg-slate-800/90 backdrop-blur-md border border-slate-700 text-white px-6 py-3 rounded-full shadow-2xl text-sm font-medium flex items-center gap-3 pointer-events-none z-[60]">
-        <div class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></div>
-        <span id="toastMessage">Updated</span>
-    </div>
-
-    <script>
-        // State management
-        let flights = [];
-        
-        // DOM Elements
-        const form = document.getElementById('flightForm');
-        const flightListContainer = document.getElementById('flightList');
-        const emptyState = document.getElementById('emptyState');
-        const submitBtn = document.getElementById('submitBtn');
-        const formTitle = document.getElementById('formTitle');
-        const toast = document.getElementById('toast');
-        const toastMessage = document.getElementById('toastMessage');
-        const modal = document.getElementById('formModal');
-        const modalOverlay = document.getElementById('formModalOverlay');
-
-        // Initialize from local storage
-        window.onload = () => {
-            const savedFlights = localStorage.getItem('flightLogData');
-            if (savedFlights) {
-                try {
-                    flights = JSON.parse(savedFlights);
-                } catch (e) {
-                    console.error("Error parsing saved flights", e);
-                }
-            }
-            renderList();
-        };
-
-        function saveToLocalStorage() {
-            localStorage.setItem('flightLogData', JSON.stringify(flights));
-        }
-
-        // iOS Style Toast Notification
-        function showToast(message) {
-            toastMessage.textContent = message;
-            toast.classList.remove('-translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('-translate-y-20', 'opacity-0');
-            }, 2500);
-        }
-
-        // Modal Controls
-        function openForm() {
-            form.reset();
-            document.getElementById('flightId').value = '';
-            formTitle.textContent = 'Log Flight';
-            submitBtn.textContent = 'Save Flight';
-            
-            modalOverlay.classList.remove('hidden');
-            // Small delay to allow display:block to apply before animating opacity/transform
-            setTimeout(() => {
-                modalOverlay.classList.remove('opacity-0');
-                modal.classList.remove('modal-leave');
-                modal.classList.add('modal-enter');
-            }, 10);
-        }
-
-        function closeForm() {
-            modal.classList.remove('modal-enter');
-            modal.classList.add('modal-leave');
-            modalOverlay.classList.add('opacity-0');
-            
-            setTimeout(() => {
-                modalOverlay.classList.add('hidden');
-            }, 300);
-            
-            // Unfocus inputs to close keyboard on iOS
-            document.activeElement.blur();
-        }
-
-        // Form Submission
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            
-            const id = document.getElementById('flightId').value;
-            const flightNumber = document.getElementById('flightNumber').value.trim();
-            const date = document.getElementById('flightDate').value;
-            const year = document.getElementById('flightYear').value;
-            const aircraftReg = document.getElementById('aircraftReg').value.trim();
-            const seat = document.getElementById('seat').value.trim();
-
-            if (id) {
-                // Update
-                const index = flights.findIndex(f => f.id === id);
-                if (index !== -1) {
-                    flights[index] = { id, flightNumber, date, year, aircraftReg, seat };
-                    showToast('Flight updated');
-                }
-            } else {
-                // Add new
-                const newFlight = {
-                    id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
-                    flightNumber,
-                    date,
-                    year,
-                    aircraftReg,
-                    seat
-                };
-                flights.unshift(newFlight);
-                showToast('Flight logged');
-            }
-
-            saveToLocalStorage();
-            renderList();
-            closeForm();
-        }
-
-        function editFlight(id) {
-            const flight = flights.find(f => f.id === id);
-            if (!flight) return;
-
-            document.getElementById('flightId').value = flight.id;
-            document.getElementById('flightNumber').value = flight.flightNumber;
-            document.getElementById('flightDate').value = flight.date;
-            document.getElementById('flightYear').value = flight.year || '';
-            document.getElementById('aircraftReg').value = flight.aircraftReg;
-            document.getElementById('seat').value = flight.seat;
-
-            formTitle.textContent = 'Edit Flight';
-            submitBtn.textContent = 'Update Flight';
-            
-            modalOverlay.classList.remove('hidden');
-            setTimeout(() => {
-                modalOverlay.classList.remove('opacity-0');
-                modal.classList.remove('modal-leave');
-                modal.classList.add('modal-enter');
-            }, 10);
-        }
-
-        function deleteFlight(id) {
-            if (confirm('Delete this flight?')) {
-                flights = flights.filter(f => f.id !== id);
-                saveToLocalStorage();
-                renderList();
-                showToast('Deleted');
-            }
-        }
-
-        // Render iOS Style Cards
-        function renderList() {
-            flightListContainer.innerHTML = '';
-            
-            if (flights.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            }
-
-            emptyState.classList.add('hidden');
-
-            flights.forEach(flight => {
-                const card = document.createElement('div');
-                card.className = 'bg-[#111827] rounded-2xl border border-slate-800/80 p-4 shadow-sm relative overflow-hidden active:bg-[#1E293B] transition-colors';
-                
-                let displayDate = flight.date;
-                try {
-                    const d = new Date(flight.date);
-                    if(!isNaN(d)) {
-                       displayDate = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-                    }
-                } catch(e) {}
-
-                card.innerHTML = `
-                    <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-purple-500"></div>
-                    <div class="flex justify-between items-start ml-2">
-                        <div>
-                            <h3 class="text-xl font-bold text-white tracking-tight">${escapeHtml(flight.flightNumber)}</h3>
-                            <p class="text-sm text-slate-400 mt-0.5">${escapeHtml(displayDate)}</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="editFlight('${flight.id}')" class="p-2 -m-2 text-indigo-400" aria-label="Edit">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                            </button>
-                            <button onclick="deleteFlight('${flight.id}')" class="p-2 -m-2 text-red-400 ml-1" aria-label="Delete">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4 flex flex-wrap gap-2 ml-2">
-                        <div class="px-2.5 py-1 rounded-lg bg-[#0B1120] border border-slate-700/50 flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span class="text-xs font-mono text-slate-300">${escapeHtml(flight.aircraftReg)}</span>
-                        </div>
-                        <div class="px-2.5 py-1 rounded-lg bg-[#0B1120] border border-slate-700/50 flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                            <span class="text-xs font-semibold text-slate-300">Seat ${escapeHtml(flight.seat)}</span>
-                        </div>
-                    </div>
-                `;
-                flightListContainer.appendChild(card);
-            });
-        }
-
-        // Export data to CSV
-        function exportCSV() {
-            if (flights.length === 0) {
-                showToast('No data to export');
-                return;
-            }
-
-            const headers = ['Flight Number', 'Date', 'Year', 'Aircraft Registration', 'Seat'];
-            const csvRows = [headers.join(',')];
-
-            flights.forEach(f => {
-                const row = [
-                    `"${f.flightNumber.replace(/"/g, '""')}"`,
-                    `"${f.date.replace(/"/g, '""')}"`,
-                    `"${(f.year || '').toString().replace(/"/g, '""')}"`,
-                    `"${f.aircraftReg.replace(/"/g, '""')}"`,
-                    `"${f.seat.replace(/"/g, '""')}"`
-                ];
-                csvRows.push(row.join(','));
-            });
-
-            const csvString = csvRows.join('\n');
-            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            link.setAttribute('download', `flight_log_${new Date().toISOString().split('T')[0]}.csv`);
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showToast('Exported Successfully');
-        }
-
-        // Import data from CSV (Replace)
-        function importCSV(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                parseAndImportCSV(text);
-                document.getElementById('csvFileInput').value = ''; // reset
-            };
-            reader.readAsText(file);
-        }
-
-        function parseAndImportCSV(csvText) {
-            try {
-                const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
-                if (lines.length <= 1) {
-                    showToast('Invalid CSV');
-                    return;
-                }
-
-                const parseLine = (line) => {
-                    const result = [];
-                    let startValueIdx = 0;
-                    let inQuotes = false;
-                    for (let i = 0; i < line.length; i++) {
-                        if (line[i] === '"') {
-                            inQuotes = !inQuotes;
-                        } else if (line[i] === ',' && !inQuotes) {
-                            result.push(line.substring(startValueIdx, i).replace(/^"|"$/g, '').replace(/""/g, '"').trim());
-                            startValueIdx = i + 1;
-                        }
-                    }
-                    result.push(line.substring(startValueIdx).replace(/^"|"$/g, '').replace(/""/g, '"').trim());
-                    return result;
-                };
-
-                const newFlights = [];
-                for (let i = 1; i < lines.length; i++) {
-                    const cols = parseLine(lines[i]);
-                    if (cols.length >= 4) {
-                        const hasYear = cols.length >= 5;
-                        newFlights.push({
-                            id: Date.now().toString() + i + Math.random().toString(36).substr(2, 5),
-                            flightNumber: cols[0],
-                            date: cols[1], 
-                            year: hasYear ? cols[2] : '',
-                            aircraftReg: hasYear ? cols[3] : cols[2],
-                            seat: hasYear ? cols[4] : cols[3]
-                        });
-                    }
-                }
-
-                // Overwrite
-                flights = newFlights;
-                saveToLocalStorage();
-                renderList();
-                showToast(`Replaced with ${newFlights.length} flights`);
-
-            } catch (err) {
-                console.error(err);
-                showToast('Error parsing CSV');
-            }
-        }
-
-        function escapeHtml(unsafe) {
-            if (!unsafe) return '';
-            return unsafe
-                .toString()
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-    </script>
+    <div class="navlabel" style="margin-top:30px">DATA</div>
+    <nav class="nav">
+      <button id="importNav"><span class="ico">⇧</span><span>Import dataset</span></button>
+      <button id="exportNav"><span class="ico">⇩</span><span>Export records</span></button>
+    </nav>
+  </div>
+  <div class="sidebottom"><div class="status"><i class="dot"></i> Local storage active</div>Personal flight archive<br>Version 2.0 · AEROLYT</div>
+</aside>
+<main class="main">
+  <header class="topbar"><div class="crumb">Workspace&nbsp; / &nbsp;<strong id="crumb">Overview</strong></div><div class="topright"><div class="today" id="today"></div><div class="avatar">AH</div></div></header>
+  <div class="content">
+    <section class="pagehead"><div><div class="eyebrow">PERSONAL AVIATION RECORDS</div><h1 id="heading">Flight overview</h1><p id="subheading">A clear view of your journeys, aircraft and flight history.</p></div><div class="actions"><button class="btn" id="exportBtn">⇩ &nbsp; Export CSV</button><button class="btn primary" id="addBtn">＋ &nbsp; Log a flight</button></div></section>
+    <section class="stats">
+      <div class="stat"><div class="statlabel">Total flights</div><div class="statvalue" id="total">0</div><div class="statfoot">Records in your archive</div></div>
+      <div class="stat"><div class="statlabel">Aircraft types / regs</div><div class="statvalue" id="aircraft">0</div><div class="statfoot">Unique registrations recorded</div></div>
+      <div class="stat"><div class="statlabel">Years active</div><div class="statvalue" id="years">0</div><div class="statfoot">Calendar years represented</div></div>
+      <div class="stat"><div class="statlabel">Latest flight</div><div class="statvalue" id="latest" style="font-size:19px;margin-top:16px">—</div><div class="statfoot">Most recent recorded journey</div></div>
+    </section>
+    <section class="panel" id="recordsPanel">
+      <div class="panelhead"><div><div class="paneltitle" id="tableTitle">Flight register</div><div class="panelsub" id="tableSub">Your complete flight history, in one place.</div></div><button class="btn" id="clearFilters">↺ &nbsp; Reset filters</button></div>
+      <div class="toolbar"><div class="search"><span>⌕</span><input id="search" placeholder="Search flight, registration or seat…"></div><select id="yearFilter"><option value="">All years</option></select><select id="sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="flight">Flight number</option></select></div>
+      <div class="tablewrap"><table><thead><tr><th>Flight</th><th>Date</th><th>Year</th><th>Aircraft registration</th><th>Seat</th><th>Actions</th></tr></thead><tbody id="flightRows"></tbody></table><div class="empty" id="empty" style="display:none"><div class="plane">✈</div><strong>No flight records found</strong><span>Log your first flight or adjust your search filters.</span></div></div>
+      <div class="footnote"><span id="count">Showing 0 records</span><span>Stored securely in this browser</span></div>
+    </section>
+    <section class="panel" id="insightsPanel" style="display:none;margin-top:20px">
+      <div class="panelhead"><div><div class="paneltitle">Archive insights</div><div class="panelsub">A snapshot of your recorded aviation history.</div></div></div>
+      <div style="padding:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px" id="insightContent"></div>
+    </section>
+  </div>
+</main>
+</div>
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modalhead"><div><h2 id="modalTitle">Log a flight</h2><p>Enter the details below to update your personal archive.</p></div><button class="close" id="closeModal">×</button></div>
+    <form id="flightForm">
+      <div class="formbody"><input type="hidden" id="flightId"><div class="formgrid">
+        <div class="field full"><label for="flightNumber">Flight number</label><input id="flightNumber" required placeholder="e.g. QF1" maxlength="20"></div>
+        <div class="field"><label for="flightDate">Date</label><input id="flightDate" type="date" required></div>
+        <div class="field"><label for="flightYear">Year</label><input id="flightYear" type="number" min="1900" max="2200" required placeholder="2026"></div>
+        <div class="field full"><label for="aircraftReg">Aircraft registration</label><input id="aircraftReg" required placeholder="e.g. VH-OQA" maxlength="30"></div>
+        <div class="field full"><label for="seat">Seat</label><input id="seat" required placeholder="e.g. 3A" maxlength="10"></div>
+      </div></div>
+      <div class="modalfoot"><button type="button" class="btn" id="cancelBtn">Cancel</button><button type="submit" class="btn teal" id="saveBtn">Save flight record</button></div>
+    </form>
+  </div>
+</div>
+<input type="file" id="csvInput" accept=".csv,text/csv" hidden>
+<div class="toast" id="toast"></div>
+<script>
+const STORE='aerolytFlightRecordsV2';
+let flights=[];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function load(){try{flights=JSON.parse(localStorage.getItem(STORE)||'[]');if(!Array.isArray(flights))flights=[];}catch{flights=[]}}
+function persist(){localStorage.setItem(STORE,JSON.stringify(flights))}
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>$('toast').classList.remove('show'),2400)}
+function fmtDate(v){if(!v)return '—';const d=new Date(v+'T12:00:00');return isNaN(d)?v:d.toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'})}
+function updateStats(){
+ $('total').textContent=flights.length;
+ $('aircraft').textContent=new Set(flights.map(f=>(f.aircraftReg||'').toUpperCase()).filter(Boolean)).size;
+ $('years').textContent=new Set(flights.map(f=>String(f.year||'')).filter(Boolean)).size;
+ const latest=[...flights].sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];
+ $('latest').textContent=latest?fmtDate(latest.date).replace(/ \d{4}$/,''):'—';
+ const years=[...new Set(flights.map(f=>String(f.year||'')).filter(Boolean))].sort((a,b)=>b-a);
+ const old=$('yearFilter').value;$('yearFilter').innerHTML='<option value="">All years</option>'+years.map(y=>`<option value="${esc(y)}">${esc(y)}</option>`).join('');$('yearFilter').value=years.includes(old)?old:'';
+ $('insightContent').innerHTML=[
+ ['Most frequent aircraft',mostFrequent(flights.map(f=>f.aircraftReg))],
+ ['Most frequent seat',mostFrequent(flights.map(f=>f.seat))],
+ ['Most frequent flight',mostFrequent(flights.map(f=>f.flightNumber))],
+ ['First recorded flight',flights.length?fmtDate([...flights].sort((a,b)=>(a.date||'').localeCompare(b.date||''))[0].date):'No records yet']
+ ].map(([k,v])=>`<div><div style="font-size:10px;color:#8a99a9;text-transform:uppercase;letter-spacing:1px;font-weight:800">${esc(k)}</div><div style="font-size:19px;font-weight:800;color:#26394e;margin-top:9px">${esc(v)}</div></div>`).join('');
+}
+function mostFrequent(a){const vals=a.filter(Boolean);if(!vals.length)return '—';const counts={};vals.forEach(v=>counts[v]=(counts[v]||0)+1);return Object.keys(counts).sort((a,b)=>counts[b]-counts[a]||a.localeCompare(b))[0]}
+function render(){
+ updateStats();
+ const q=$('search').value.trim().toLowerCase(),yr=$('yearFilter').value,sort=$('sort').value;
+ let list=flights.filter(f=>(!yr||String(f.year)===yr)&&[f.flightNumber,f.date,f.year,f.aircraftReg,f.seat].some(v=>String(v||'').toLowerCase().includes(q)));
+ if(sort==='newest')list.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+ if(sort==='oldest')list.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+ if(sort==='flight')list.sort((a,b)=>(a.flightNumber||'').localeCompare(b.flightNumber||''));
+ $('flightRows').innerHTML=list.map(f=>`<tr>
+ <td><span class="flightno">${esc(f.flightNumber)}</span></td><td class="datecell">${esc(fmtDate(f.date))}</td><td>${esc(f.year||'—')}</td>
+ <td><span class="tag">${esc(f.aircraftReg)}</span></td><td><span class="tag seat">${esc(f.seat)}</span></td>
+ <td><div class="rowactions"><button class="iconbtn" title="Edit flight" data-edit="${esc(f.id)}">✎</button><button class="iconbtn del" title="Delete flight" data-delete="${esc(f.id)}">⌫</button></div></td></tr>`).join('');
+ $('empty').style.display=list.length?'none':'block';$('flightRows').style.display=list.length?'':'none';
+ $('count').textContent=`Showing ${list.length} of ${flights.length} record${flights.length===1?'':'s'}`;
+}
+function openForm(f=null){
+ $('flightForm').reset();$('flightId').value=f?.id||'';
+ $('modalTitle').textContent=f?'Edit flight record':'Log a flight';
+ $('saveBtn').textContent=f?'Update flight record':'Save flight record';
+ if(f){$('flightNumber').value=f.flightNumber||'';$('flightDate').value=f.date||'';$('flightYear').value=f.year||'';$('aircraftReg').value=f.aircraftReg||'';$('seat').value=f.seat||'';}
+ $('overlay').classList.add('show');setTimeout(()=>$('flightNumber').focus(),80);
+}
+function closeForm(){$('overlay').classList.remove('show')}
+$('flightDate').addEventListener('change',e=>{if(e.target.value)$('flightYear').value=e.target.value.slice(0,4)});
+$('flightForm').addEventListener('submit',e=>{
+ e.preventDefault();const id=$('flightId').value;
+ const f={id:id||('f'+Date.now()+Math.random().toString(36).slice(2,7)),flightNumber:$('flightNumber').value.trim().toUpperCase(),date:$('flightDate').value,year:$('flightYear').value,aircraftReg:$('aircraftReg').value.trim().toUpperCase(),seat:$('seat').value.trim().toUpperCase()};
+ if(id){const i=flights.findIndex(x=>x.id===id);if(i>=0)flights[i]=f;toast('Flight record updated');}else{flights.unshift(f);toast('Flight added to your archive');}
+ persist();render();closeForm();
+});
+$('flightRows').addEventListener('click',e=>{
+ const edit=e.target.closest('[data-edit]'),del=e.target.closest('[data-delete]');
+ if(edit){const f=flights.find(x=>x.id===edit.dataset.edit);if(f)openForm(f)}
+ if(del){const f=flights.find(x=>x.id===del.dataset.delete);if(f&&confirm(`Delete ${f.flightNumber} from your flight records?`)){flights=flights.filter(x=>x.id!==f.id);persist();render();toast('Flight record deleted')}}
+});
+function csvCell(v){return '"'+String(v??'').replace(/"/g,'""')+'"'}
+function exportCSV(){
+ if(!flights.length){toast('There are no records to export');return}
+ const rows=[['Flight Number','Date','Year','Aircraft Registration','Seat'],...flights.map(f=>[f.flightNumber,f.date,f.year,f.aircraftReg,f.seat])];
+ const blob=new Blob([rows.map(r=>r.map(csvCell).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'});
+ const a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download='aerolyt-flight-records.csv';a.click();URL.revokeObjectURL(url);toast('CSV export prepared');
+}
+function parseCSV(text){
+ const rows=[];let row=[],v='',quoted=false;
+ for(let i=0;i<text.length;i++){const c=text[i];if(quoted){if(c==='"'&&text[i+1]==='"'){v+='"';i++}else if(c==='"')quoted=false;else v+=c}else if(c==='"')quoted=true;else if(c===','){row.push(v);v=''}else if(c==='\n'){row.push(v.replace(/\r$/,''));rows.push(row);row=[];v=''}else v+=c}
+ if(v.length||row.length){row.push(v.replace(/\r$/,''));rows.push(row)}return rows;
+}
+$('csvInput').addEventListener('change',async e=>{
+ const file=e.target.files[0];if(!file)return;
+ try{const rows=parseCSV(await file.text());if(rows.length<2)throw Error('empty');
+ const head=rows[0].map(x=>x.toLowerCase().trim());
+ const idx=(...names)=>head.findIndex(h=>names.includes(h));
+ const fi=idx('flight number','flightnumber','flight'),di=idx('date'),yi=idx('year'),ai=idx('aircraft registration','aircraft reg','aircraftreg','registration'),si=idx('seat');
+ if(fi<0||di<0||ai<0||si<0)throw Error('headers');
+ const incoming=rows.slice(1).filter(r=>r.some(x=>x.trim())).map((r,i)=>({id:'i'+Date.now()+i+Math.random().toString(36).slice(2,5),flightNumber:r[fi]||'',date:r[di]||'',year:yi>=0?r[yi]:(r[di]||'').slice(0,4),aircraftReg:r[ai]||'',seat:r[si]||''}));
+ if(!incoming.length)throw Error('empty');
+ if(confirm(`Import ${incoming.length} flight records? This will replace the records currently stored in this browser.`)){flights=incoming;persist();render();toast(`${incoming.length} records imported`)}
+ }catch(err){toast('Could not import this CSV. Check the column headings.')}finally{e.target.value=''}
+});
+$('addBtn').onclick=()=>openForm();$('closeModal').onclick=closeForm;$('cancelBtn').onclick=closeForm;$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))closeForm()});
+$('exportBtn').onclick=exportCSV;$('exportNav').onclick=exportCSV;$('importNav').onclick=()=>$('csvInput').click();
+$('search').addEventListener('input',render);$('yearFilter').addEventListener('change',render);$('sort').addEventListener('change',render);
+$('clearFilters').onclick=()=>{$('search').value='';$('yearFilter').value='';$('sort').value='newest';render()};
+document.querySelectorAll('.nav button[data-view]').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('.nav button[data-view]').forEach(x=>x.classList.toggle('active',x===b));
+ const view=b.dataset.view;$('crumb').textContent=view==='overview'?'Overview':view==='flights'?'Flight records':'Flight insights';
+ $('heading').textContent=view==='overview'?'Flight overview':view==='flights'?'Flight records':'Flight insights';
+ $('subheading').textContent=view==='overview'?'A clear view of your journeys, aircraft and flight history.':view==='flights'?'Search, manage and maintain your complete flight register.':'Explore patterns across your recorded flight history.';
+ $('recordsPanel').style.display=view==='insights'?'none':'block';$('insightsPanel').style.display=view==='insights'?'block':'none';
+ if(view==='flights')$('tableTitle').textContent='All flight records';else $('tableTitle').textContent='Flight register';
+});
+$('today').textContent=new Date().toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+load();render();
+</script>
 </body>
 </html>
